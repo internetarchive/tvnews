@@ -7,7 +7,7 @@ setup(
     author_email='reinischmax@gmail.com',
     packages=['article2tvnews', 'article2tvnews.test'],
     # scripts=['bin/stowe-towels.py','bin/wash-towels.py'],
-    # url='http://pypi.python.org/pypi/TowelStuff/',
+    url='https://github.com/MaxReinisch/article2tvnews-package',
     license='LICENSE.txt',
     description='Recommends TV news clips related to given news articles',
     long_description=open('README.txt').read(),

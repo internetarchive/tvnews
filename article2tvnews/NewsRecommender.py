@@ -1,3 +1,4 @@
+#!/usr/bin/python3.4
 # News Recommender version 2
 # written by Max Reinisch
 
@@ -55,7 +56,7 @@ def getDGELTv2Response(entities):
     while(not good_result):
         if len(entities) ==0:
             return {}
-        query = " ".join([f'"{entity}"' for entity in entities])
+        query = " ".join(['"' + entity + '"' for entity in entities])
         url = 'https://api.gdeltproject.org/api/v2/tv/tv?query='+query+ '%20market:%22National%22&mode=clipgallery&format=json&datanorm=perc&timelinesmooth=0&datacomb=sep&last24=yes&timezoom=yes&TIMESPAN=14days#'
         res = requests.get(url)
         # with open('log.txt', 'a') as f: # Log for Debugging purposes

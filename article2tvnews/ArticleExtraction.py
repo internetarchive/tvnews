@@ -1,4 +1,4 @@
-
+#!/usr/bin/python3.4
 # Article Extraction Module
 # written by Max Reinisch
 
@@ -30,6 +30,6 @@ def getHTML(url):
     """
     res = requests.get(url, headers=header)
     if res.status_code >=400:
-        print(f"Requested URL returned status code: {res.status_code}")
+        print("Requested URL returned status code: " + res.status_code)
         exit(-1)
     return res.text
