@@ -21,13 +21,12 @@ import sys
 import setuptools
 
 deps = [
-    "lxml==4.2.4",
-    "numpy==1.15.0",
-    "readability-lxml==0.7",
-    "requests==2.19.1",
-    "scikit-learn==0.19.2",
-    "scipy==1.1.0",
-    "urllib3==1.23"
+    "lxml",
+    "numpy",
+    "readability-lxml",
+    "scikit-learn",
+    "scipy",
+    "urllib3"
 ]
 
 setuptools.setup(
@@ -41,6 +40,8 @@ setuptools.setup(
         license='LICENSE.txt',
         packages=['tvnews', 'tvnews.test'],
         install_requires=deps,
+        test_suite='nose.collector',
+        tests_require=['nose'],
         zip_safe=False,
         classifiers=[
             'Development Status :: 2 - Pre-Alpha'

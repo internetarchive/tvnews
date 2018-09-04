@@ -4,10 +4,8 @@
 
 # Given an article URL, extract the article body text
 
-# TODO: use urllib3 instead of Requests
-
 import json
-import requests
+import urllib3
 import re
 from readability import Document
 
@@ -17,6 +15,9 @@ import logging
 log = logging.getLogger(__name__)
 header = {"Accept-Encoding": "gzip", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
+urllib3.disable_warnings()
+http = urllib3.PoolManager()
+# logging.getLogger('readability.readability').setLevel(logging.CRITICAL)
 
 def extract(html):
     """
@@ -32,8 +33,9 @@ def getHTML(url):
     """
     Requests article and returns html
     """
-    res = requests.get(url, headers=header)
-    if res.status_code >=400:
-        log.error("Requested URL returned status code: " + res.status_code+ ".  Exiting...")
-        exit(-1)
-    return res.text
+    res = http.request('GET', url, headers=header)
+    if res.status >=400:
+        log.error("Requested URL returned status code: " +str(res.status)+ ".  Exiting...")
+        exit(1)
+    # log.info(res.data)
+    return res.data.decode('utf-8')
