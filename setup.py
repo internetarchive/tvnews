@@ -38,7 +38,7 @@ setuptools.setup(
         author_email='reinischmax@gmail.com',
         long_description=open('README.md').read(),
         license='LICENSE.txt',
-        packages=['tvnews', 'tvnews.test'],
+        packages=['tvnews'],
         install_requires=deps,
         test_suite='nose.collector',
         tests_require=['nose'],
