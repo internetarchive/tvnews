@@ -32,7 +32,7 @@ http = urllib3.PoolManager()
 def makeRecommendations(article):
     calais_json = getOpenCalaisResponse(article)
     entities = getSearchQuery(calais_json)
-    GDELT_response = getDGELTv2Response(entities) #GDELT_response in JSON format
+    GDELT_response = getGDELTv2Response(entities) #GDELT_response in JSON format
     if(GDELT_response.get('clips')):
         return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
     else:
@@ -55,7 +55,7 @@ def getSearchQuery(c):
     entities = [values for values in c.values() if values.get("_typeGroup") == "entities"]
     return [e.get('lastname') or e['name'] for e in sorted(entities, key=lambda x: len(x['instances']), reverse=True)]
 
-def getDGELTv2Response(entities):
+def getGDELTv2Response(entities):
     good_result = False
     entities = entities[:3]
     while(not good_result):
@@ -70,9 +70,12 @@ def getDGELTv2Response(entities):
         if(res.status>=400):
             log.error("GDELT returned status code: " + str(res.status)+ ".  Exiting...")
             exit(-1)
-        gdelt_json = json.loads(res.data.decode('utf-8'))
+        try:
+            gdelt_json = json.loads(res.data.decode('utf-8'))
+        except ValueError:
+            log.warning("Bad GDELT response, Returning empty result.");
+            return {}
         log.info(url)
-        log.info(gdelt_json)
         if len(gdelt_json.keys()) ==0:
             entities = entities[0:-1]
             log.info("GDLET returned 0 results. Simplifying search to: " + str(entities))
