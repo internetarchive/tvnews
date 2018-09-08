@@ -16,3 +16,9 @@ class TestNewsRecommender(TestCase):
         article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.bad_url))
         clips = NewsRecommender.makeRecommendations(article)
         self.assertTrue(len(clips) == 0)
+
+    def test_makeRecommendations_sort(self):
+        article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.good_url))
+        clips = NewsRecommender.makeRecommendations(article)
+        for i in range(len(clips)-1):
+            self.assertTrue(clips[i].get("similarity") <= clips[i+1].get("similarity"))

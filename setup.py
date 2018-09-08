@@ -31,7 +31,7 @@ deps = [
 
 setuptools.setup(
         name='tvnews',
-        version='0.1.1',
+        version='0.1.2',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/MaxReinisch/tvnews',
         author='Max W. Reinisch',

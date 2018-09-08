@@ -42,8 +42,8 @@ def makeRecommendations(article):
 def getOpenCalaisResponse(article):
     response = http.request('POST', CALAIS_ENDPOINT, body= article.get("body").encode('utf-8'), headers=CALAIS_HEADER, timeout=80)
     if response.status >= 400:
-        log.error("OpenCalais returned status code: " + str(res.status) + ".  Exiting...")
-        exit(-1)
+        log.error("OpenCalais returned status code: " + str(response.status) + ".  Exiting...")
+        return {}
     content = response.data.decode('utf-8')
 
     c = json.loads(content)
@@ -53,6 +53,8 @@ def getSearchQuery(c):
     # This function is an unsolved problem.  How to find the best search query
     # Currently returns a list of all entities' names in order of number of mentions
     entities = [values for values in c.values() if values.get("_typeGroup") == "entities"]
+    if len(entities) ==0:
+        return []
     return [e.get('lastname') or e['name'] for e in sorted(entities, key=lambda x: len(x['instances']), reverse=True)]
 
 def getGDELTv2Response(entities):
@@ -69,7 +71,7 @@ def getGDELTv2Response(entities):
 
         if(res.status>=400):
             log.error("GDELT returned status code: " + str(res.status)+ ".  Exiting...")
-            exit(-1)
+            return {}
         try:
             gdelt_json = json.loads(res.data.decode('utf-8'))
         except ValueError:
@@ -89,7 +91,9 @@ def sortClipsBySimilarity(clips, article):
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
     cosine_distances = [cosine(vec.todense(), article_bow.todense()) for vec in bow]
-
+    ret = []
     for clip, dist in zip(clips, cosine_distances):
         clip.update({"similarity": dist})
-    return clips
+        ret.append(clip)
+    log.info(ret)
+    return sorted(ret, key = lambda x: x.get('similarity'))

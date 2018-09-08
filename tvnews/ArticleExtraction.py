@@ -17,7 +17,7 @@ header = {"Accept-Encoding": "gzip", "User-Agent": "Mozilla/5.0 (Windows NT 10.0
 tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
 urllib3.disable_warnings()
 http = urllib3.PoolManager()
-# logging.getLogger('readability.readability').setLevel(logging.CRITICAL)
+logging.getLogger('readability.readability').setLevel(logging.CRITICAL)
 
 def extract(html):
     """
