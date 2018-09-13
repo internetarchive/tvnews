@@ -76,7 +76,7 @@ def getGDELTv2Response(entities):
             gdelt_json = json.loads(res.data.decode('utf-8'))
         except ValueError:
             log.warning("Bad GDELT response, Returning empty result.");
-            return {}
+            gdelt_json = {}
         log.info(url)
         if len(gdelt_json.keys()) ==0:
             entities = entities[0:-1]
