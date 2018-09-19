@@ -19,6 +19,11 @@ extension. Typical usage looks something like this::
         print(clip)
 
 
+## Possible Changes:
+- OpenCalais takes only headline (and first couple of Paragraphs) instead of whole Article
+- Time period for videos
+- extract embedded tweets (possible added weight)
+
 
 ## Thanks
 
