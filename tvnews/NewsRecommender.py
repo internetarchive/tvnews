@@ -10,6 +10,7 @@
 ####################
 
 import urllib3
+from urllib.parse import urlencode
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
@@ -21,10 +22,10 @@ import logging
 #### VARIABLES #####
 ####################
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 CALAIS_ENDPOINT = 'https://api.thomsonreuters.com/permid/calais'
 CALAIS_TOKEN = "cvTFhY53VXBYm5HO85weHPx346W05015"
 CALAIS_HEADER = {'X-AG-Access-Token' : CALAIS_TOKEN, 'Content-Type' : 'text/raw', 'outputformat' : 'application/json'}
+GDELT_HEADER = {'Content-Type' : 'application/json', 'outputformat' : 'application/json'}
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
 http = urllib3.PoolManager()
@@ -65,8 +66,10 @@ def getGDELTv2Response(entities):
             log.warning("No search found.  Returning empty result.")
             return {}
         query = "+".join(['"' + entity + '"' for entity in entities])
-        url = 'https://api.gdeltproject.org/api/v2/tv/tv?query='+query+ '%20market:%22National%22&mode=clipgallery&format=json&datanorm=perc&timelinesmooth=0&datacomb=sep&last24=yes&timezoom=yes&TIMESPAN=14days#'
-        res = http.request('GET', url)
+        # url = 'https://api.gdeltproject.org/api/v2/tv/tv?query='+query+ 'market:%22National%22&mode=clipgallery&format=json&datanorm=perc&timelinesmooth=0&datacomb=sep&last24=yes&timezoom=yes&TIMESPAN=14days'
+        encoded_args = urlencode({'query': query+' market:"National"', 'mode':'clipgallery', 'format':'json', 'datanorm':'perc',"timelinesmooth":0, "datacomb":"sep", "last24":"yes", "timezoom":"yes", "TIMESPAN":"14days"})
+        url = 'https://api.gdeltproject.org/api/v2/tv/tv?' + encoded_args
+        res = http.urlopen("GET", url)
 
 
         if(res.status>=400):
@@ -76,6 +79,7 @@ def getGDELTv2Response(entities):
             gdelt_json = json.loads(res.data.decode('utf-8'))
         except ValueError:
             log.warning("Bad GDELT response, Returning empty result.");
+            log.warning(url)
             gdelt_json = {}
         log.info(url)
         if len(gdelt_json.keys()) ==0:
