@@ -26,12 +26,13 @@ deps = [
     "readability-lxml",
     "scikit-learn",
     "scipy",
-    "urllib3"
+    "urllib3",
+    "spacy"
 ]
 
 setuptools.setup(
         name='tvnews',
-        version='0.1.4',
+        version='0.1.5',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/MaxReinisch/tvnews',
         author='Max W. Reinisch',
