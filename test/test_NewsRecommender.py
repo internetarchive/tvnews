@@ -20,16 +20,13 @@ class TestNewsRecommender(TestCase):
             self.assertTrue(clip.get("preview_url"))
             self.assertTrue(clip.get("similarity"))
             self.assertTrue(clip.get("show"))
-
+    def test_makeRecommendations_non_article(self):
+        article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.bad_url))
+        clips = NewsRecommender.makeRecommendations(article)
+        self.assertTrue(len(clips) == 0)
 
     def test_makeRecommendations_sort(self):
         article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.good_url))
         clips = NewsRecommender.makeRecommendations(article)
         for i in range(len(clips)-1):
             self.assertTrue(clips[i].get("similarity") <= clips[i+1].get("similarity"))
-
-    def test_getSearchQuery(self):
-        article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.good_url))
-        entities = NewsRecommender.extractEntities(article)
-        query = NewsRecommender.getSearchQuery(entities)
-        self.assertTrue(len(query) == 3)
