@@ -19,8 +19,27 @@ extension. Typical usage looks something like this::
         print(clip)
 
 
+Must include a config.json file::
+
+    {
+      "OpenCalais" : {
+        "CALAIS_ENDPOINT" : "https://api.thomsonreuters.com/permid/calais",
+        "CALAIS_HEADER" : {
+          "X-AG-Access-Token" : <OPEN_CALAIS_TOKEN>,
+          "Content-Type" : "text/raw",
+          "outputformat" : "application/json"
+        }
+      },
+      "GDELT" : {
+        "GDELT_HEADER" : {
+          "Content-Type" : "application/json",
+          "outputformat" : "application/json"
+        }
+      }
+    }
+
+
 ## Possible Changes:
-- OpenCalais takes only headline (and first couple of Paragraphs) instead of whole Article
 - Time period for videos
 - extract embedded tweets (possible added weight)
 

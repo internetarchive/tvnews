@@ -14,5 +14,5 @@ class TestArticleExtraction(TestCase):
         html = ArticleExtraction.getHTML(self.good_url)
         article = ArticleExtraction.extract(html)
         self.assertTrue(isinstance(article, dict))
-
-    
+        self.assertTrue(isinstance(article['title'], str))
+        self.assertTrue(isinstance(article['body'], str))
