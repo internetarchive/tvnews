@@ -35,9 +35,9 @@ class TestNewsRecommender(TestCase):
         for i in range(len(clips)-1):
             self.assertTrue(clips[i].get("similarity") <= clips[i+1].get("similarity"))
 
-    def test_makeRecommendations_spacy(self):
+    def test_makeRecommendations_bad_calais(self):
         article = ArticleExtraction.extract(ArticleExtraction.getHTML(self.good_url))
-        clips = NewsRecommender.makeRecommendations(article, extraction="spacy")
+        clips = NewsRecommender.makeRecommendations(article, calais_token = "klasdallksdlfaklke")
         for clip in clips:
             self.assertTrue(clip.get("preview_url"))
             self.assertTrue(clip.get("similarity"))

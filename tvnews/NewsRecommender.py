@@ -25,22 +25,15 @@ import logging
 #### VARIABLES #####
 ####################
 
+CALAIS_ENDPOINT = 'https://api.thomsonreuters.com/permid/calais'
+GDELT_HEADER = {'Content-Type' : 'application/json', 'outputformat' : 'application/json'}
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
 http = urllib3.PoolManager()
 nlp = en_core_web_sm.load()
 
-with open('config.json') as json_data_file:
-    config = json.load(json_data_file)
-    print(config)
-    CALAIS_ENDPOINT = config["OpenCalais"]["CALAIS_ENDPOINT"]
-    CALAIS_HEADER = config["OpenCalais"]["CALAIS_HEADER"]
-    GDELT_HEADER = config["GDELT"]["GDELT_HEADER"]
-
-
-def makeRecommendations(article, extraction = "calais"):
-
-    query = getSearchQuery(article, extraction)
+def makeRecommendations(article, calais_token = False):
+    query = getSearchQuery(article, calais_token)
     GDELT_response = getGDELTv2Response(query) #GDELT_response in JSON format
     if(GDELT_response.get('clips')):
         return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
@@ -49,13 +42,13 @@ def makeRecommendations(article, extraction = "calais"):
 
 
 
-def getSearchQuery(article, extraction):
-    if(extraction == "calais"):
-        calais_json = getOpenCalaisResponse(article)
-        return parseCalais(calais_json)
-    else:
-        entities = extractEntities(article)
-        return parseEntities(entities)
+def getSearchQuery(article, calais_token = False):
+    if(calais_token):
+        calais_json = getOpenCalaisResponse(article, calais_token)
+        if calais_json != "SpaCy":
+            return parseCalais(calais_json)
+    entities = extractEntities(article)
+    return parseEntities(entities)
 
 def extractEntities(article):
     doc = nlp(article["title"] + article["title"] + article["body"])
@@ -67,11 +60,12 @@ def parseEntities(entities):
 
     return [e[0] for e in Counter(entities).most_common(3)]
 
-def getOpenCalaisResponse(article):
+def getOpenCalaisResponse(article, calais_token):
+    CALAIS_HEADER = {'X-AG-Access-Token' : calais_token, 'Content-Type' : 'text/raw', 'outputformat' : 'application/json'}
     response = http.request('POST', CALAIS_ENDPOINT, body= (article.get("title")+" "+article.get("body")).encode('utf-8'), headers=CALAIS_HEADER, timeout=80)
     if response.status >= 400:
-        log.error("OpenCalais returned status code: " + str(response.status) + ".  Exiting...")
-        return {}
+        log.warning("OpenCalais returned status code: " + str(response.status) + ".  Falling back to SpaCy extraction protocol...")
+        return "SpaCy"
     content = response.data.decode('utf-8')
 
     c = json.loads(content)
