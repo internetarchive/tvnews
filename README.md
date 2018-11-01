@@ -19,8 +19,21 @@ extension. Typical usage looks something like this::
         print(clip)
 
 
+## Entity Extraction
+By default, NewsRecommender uses SpaCy for entity extraction. However, one can choose to use the [OpenCalais API](http://www.opencalais.com/).  First, the user must [register to get an API key](http://www.opencalais.com/opencalais-api/).  Then pass it as `calais_token` when you call `makeRecommendations()`::
+
+    #!/usr/bin/env python
+
+    from article2tvnews import ArticleExtraction, NewsRecommender
+
+    url = <news-article-url>
+    html = ArticleExtraction.getHTML(url)
+    article = ArticleExtraction.extract(html)
+    for clip in NewsRecommender.makeRecommendations(article, calais_token = <api_key>):
+        print(clip)
+
+
 ## Possible Changes:
-- OpenCalais takes only headline (and first couple of Paragraphs) instead of whole Article
 - Time period for videos
 - extract embedded tweets (possible added weight)
 

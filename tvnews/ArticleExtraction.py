@@ -26,7 +26,7 @@ def extract(html):
 
     doc = Document(html)
     json_ret = {"title": tag_re.sub('', doc.title()),
-    "body": tag_re.sub('', doc.summary())}
+    "body": tag_re.sub('', doc.summary()).replace("\n", " " ).replace("\xa0", " ")}
     return json_ret
 
 def getHTML(url):

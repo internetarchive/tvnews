@@ -14,6 +14,9 @@ from urllib.parse import urlencode
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
+import spacy
+from collections import Counter
+import en_core_web_sm
 import logging
 
 
@@ -23,34 +26,52 @@ import logging
 ####################
 
 CALAIS_ENDPOINT = 'https://api.thomsonreuters.com/permid/calais'
-CALAIS_TOKEN = "cvTFhY53VXBYm5HO85weHPx346W05015"
-CALAIS_HEADER = {'X-AG-Access-Token' : CALAIS_TOKEN, 'Content-Type' : 'text/raw', 'outputformat' : 'application/json'}
 GDELT_HEADER = {'Content-Type' : 'application/json', 'outputformat' : 'application/json'}
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
 http = urllib3.PoolManager()
+nlp = en_core_web_sm.load()
 
-def makeRecommendations(article):
-    calais_json = getOpenCalaisResponse(article)
-    entities = getSearchQuery(calais_json)
-    GDELT_response = getGDELTv2Response(entities) #GDELT_response in JSON format
+def makeRecommendations(article, calais_token = False):
+    query = getSearchQuery(article, calais_token)
+    GDELT_response = getGDELTv2Response(query) #GDELT_response in JSON format
     if(GDELT_response.get('clips')):
         return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
     else:
         return []
 
 
-def getOpenCalaisResponse(article):
-    response = http.request('POST', CALAIS_ENDPOINT, body= article.get("body").encode('utf-8'), headers=CALAIS_HEADER, timeout=80)
+
+def getSearchQuery(article, calais_token = False):
+    if(calais_token):
+        calais_json = getOpenCalaisResponse(article, calais_token)
+        if calais_json != "SpaCy":
+            return parseCalais(calais_json)
+    entities = extractEntities(article)
+    return parseEntities(entities)
+
+def extractEntities(article):
+    doc = nlp(article["title"] + article["title"] + article["body"])
+    return [x.text for x in doc.ents]
+
+def parseEntities(entities):
+    if len(entities) == 0:
+        return []
+
+    return [e[0] for e in Counter(entities).most_common(3)]
+
+def getOpenCalaisResponse(article, calais_token):
+    CALAIS_HEADER = {'X-AG-Access-Token' : calais_token, 'Content-Type' : 'text/raw', 'outputformat' : 'application/json'}
+    response = http.request('POST', CALAIS_ENDPOINT, body= (article.get("title")+" "+article.get("body")).encode('utf-8'), headers=CALAIS_HEADER, timeout=80)
     if response.status >= 400:
-        log.error("OpenCalais returned status code: " + str(response.status) + ".  Exiting...")
-        return {}
+        log.warning("OpenCalais returned status code: " + str(response.status) + ".  Falling back to SpaCy extraction protocol...")
+        return "SpaCy"
     content = response.data.decode('utf-8')
 
     c = json.loads(content)
     return c
 
-def getSearchQuery(c):
+def parseCalais(c):
     # This function is an unsolved problem.  How to find the best search query
     # Currently returns a list of all entities' names in order of number of mentions
     entities = [values for values in c.values() if values.get("_typeGroup") == "entities"]
@@ -58,9 +79,9 @@ def getSearchQuery(c):
         return []
     return [e.get('lastname') or e['name'] for e in sorted(entities, key=lambda x: len(x['instances']), reverse=True)]
 
-def getGDELTv2Response(entities):
+def getGDELTv2Response(query):
     good_result = False
-    entities = entities[:3]
+    entities = query[:3]
     while(not good_result):
         if len(entities) ==0:
             log.warning("No search found.  Returning empty result.")
