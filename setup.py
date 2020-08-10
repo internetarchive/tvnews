@@ -17,22 +17,12 @@
 # USA.
 # '''
 
-import sys
 import setuptools
 
-deps = [
-    "lxml",
-    "numpy",
-    "readability-lxml",
-    "scikit-learn",
-    "scipy",
-    "spacy",
-    "urllib3"
-]
 
 setuptools.setup(
         name='tvnews',
-        version='0.1.5',
+        version='0.2.0',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/MaxReinisch/tvnews',
         author='Max W. Reinisch',
@@ -40,15 +30,23 @@ setuptools.setup(
         long_description=open('README.md').read(),
         license='LICENSE.txt',
         packages=['tvnews'],
-        install_requires=deps,
+        install_requires=[
+            "lxml",
+            "numpy",
+            "readability-lxml",
+            "scikit-learn",
+            "scipy",
+            "spacy<=2.3.2",
+            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz",
+            "urllib3"
+            ],
         test_suite='nose.collector',
         tests_require=['nose'],
         zip_safe=False,
         classifiers=[
-            'Development Status :: 2 - Pre-Alpha'
-            'Programming Language :: Python :: 3.4',
+            'Development Status :: 4 - Beta'
+            'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
             'Topic :: Software Development :: Libraries :: Python Modules',
 
         ])
