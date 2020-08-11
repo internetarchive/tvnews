@@ -11,7 +11,7 @@ header = {"Accept-Encoding": "gzip",
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
 urllib3.disable_warnings()
-http = urllib3.PoolManager()
+http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
 logging.getLogger('readability.readability').setLevel(logging.CRITICAL)
 
 
