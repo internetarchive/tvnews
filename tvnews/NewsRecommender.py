@@ -9,7 +9,6 @@ from scipy.spatial.distance import cosine
 import en_core_web_sm
 
 
-CALAIS_ENDPOINT = 'https://api.thomsonreuters.com/permid/calais'
 GDELT_HEADER = {'Content-Type': 'application/json',
                 'outputformat': 'application/json'}
 log = logging.getLogger(__name__)
@@ -18,19 +17,15 @@ http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
 nlp = en_core_web_sm.load()
 
 
-def makeRecommendations(article, calais_token=False):
-    query = getSearchQuery(article, calais_token)
+def makeRecommendations(article):
+    query = getSearchQuery(article)
     GDELT_response = getGDELTv2Response(query)  # GDELT_response in JSON format
     if GDELT_response.get('clips'):
         return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
     return []
 
 
-def getSearchQuery(article, calais_token=False):
-    if calais_token:
-        calais_json = getOpenCalaisResponse(article, calais_token)
-        if calais_json != "SpaCy":
-            return parseCalais(calais_json)
+def getSearchQuery(article):
     entities = extractEntities(article)
     return parseEntities(entities)
 
@@ -46,32 +41,6 @@ def parseEntities(entities):
     if len(entities) == 0:
         return []
     return [e[0] for e in Counter(entities).most_common(3)]
-
-
-def getOpenCalaisResponse(article, calais_token):
-    CALAIS_HEADER = {'X-AG-Access-Token': calais_token,
-                     'Content-Type': 'text/raw',
-                     'outputformat': 'application/json'}
-    response = http.request('POST', CALAIS_ENDPOINT,
-                            body=(article.get("title")+" "+article.get("body")).encode('utf-8'),
-                            headers=CALAIS_HEADER, timeout=80)
-    print(response)
-    if response.status >= 400:
-        log.warning("OpenCalais returned status code: %d. Falling back to SpaCy extraction protocol...", response.status)
-        return "SpaCy"
-    content = response.data.decode('utf-8')
-
-    c = json.loads(content)
-    return c
-
-
-def parseCalais(c):
-    # This function is an unsolved problem.  How to find the best search query
-    # Currently returns a list of all entities' names in order of number of mentions
-    entities = [values for values in c.values() if values.get("_typeGroup") == "entities"]
-    if len(entities) == 0:
-        return []
-    return [e.get('lastname') or e['name'] for e in sorted(entities, key=lambda x: len(x['instances']), reverse=True)]
 
 
 def getGDELTv2Response(query):

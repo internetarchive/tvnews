@@ -22,7 +22,7 @@ import setuptools
 
 setuptools.setup(
         name='tvnews',
-        version='0.2.0',
+        version='0.2.1',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/internetarchive/tvnews',
         author='Max W. Reinisch',
@@ -31,7 +31,7 @@ setuptools.setup(
         license='LICENSE.txt',
         packages=['tvnews'],
         install_requires=[
-            "readability-lxml",
+            "readability-lxml>=0.8.1",
             "scikit-learn",
             "scipy",
             "spacy<=2.3.2",
