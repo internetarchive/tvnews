@@ -84,17 +84,18 @@ def getGDELTv2Response(query):
                                    'datanorm': 'perc', "timelinesmooth": 0,
                                    "datacomb": "sep", "last24": "yes",
                                    "timezoom": "yes", "TIMESPAN": "14days"})
-        log.info(res.geturl())
         if res.status >= 400:
             log.error("GDELT returned status code: %d. Exiting...", res.status)
             return {}
         try:
             gdelt_json = json.loads(res.data.decode('utf-8'))
+            if gdelt_json:
+                return gdelt_json
         except ValueError:
             gdelt_json = {}
-        if not gdelt_json:
-            entities = entities[0:-1]
-            log.info("GDELT returned 0 results. Simplifying search to: " + str(entities))
+
+        entities.pop()
+        log.info("GDELT returned 0 results. Simplifying search to: " + str(entities))
 
     log.warning("No search found. Returning empty result.")
     return {}
