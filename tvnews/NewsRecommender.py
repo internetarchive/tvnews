@@ -1,13 +1,12 @@
 # News Recommender version 2. Given a URL for a news article, recommend TV news
 # clips similar to article contents
-import urllib3
-from urllib.parse import urlencode
+from collections import Counter
+import logging
 import json
+import urllib3
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
-from collections import Counter
 import en_core_web_sm
-import logging
 
 
 CALAIS_ENDPOINT = 'https://api.thomsonreuters.com/permid/calais'
@@ -15,21 +14,20 @@ GDELT_HEADER = {'Content-Type': 'application/json',
                 'outputformat': 'application/json'}
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
-http = urllib3.PoolManager()
+http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
 nlp = en_core_web_sm.load()
 
 
 def makeRecommendations(article, calais_token=False):
     query = getSearchQuery(article, calais_token)
     GDELT_response = getGDELTv2Response(query)  # GDELT_response in JSON format
-    if(GDELT_response.get('clips')):
+    if GDELT_response.get('clips'):
         return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
-    else:
-        return []
+    return []
 
 
 def getSearchQuery(article, calais_token=False):
-    if(calais_token):
+    if calais_token:
         calais_json = getOpenCalaisResponse(article, calais_token)
         if calais_json != "SpaCy":
             return parseCalais(calais_json)
@@ -38,6 +36,8 @@ def getSearchQuery(article, calais_token=False):
 
 
 def extractEntities(article):
+    """Get title twice to increase title weight.
+    """
     doc = nlp(article["title"] + article["title"] + article["body"])
     return [x.text for x in doc.ents]
 
@@ -55,6 +55,7 @@ def getOpenCalaisResponse(article, calais_token):
     response = http.request('POST', CALAIS_ENDPOINT,
                             body=(article.get("title")+" "+article.get("body")).encode('utf-8'),
                             headers=CALAIS_HEADER, timeout=80)
+    print(response)
     if response.status >= 400:
         log.warning("OpenCalais returned status code: %d. Falling back to SpaCy extraction protocol...", response.status)
         return "SpaCy"
@@ -74,37 +75,29 @@ def parseCalais(c):
 
 
 def getGDELTv2Response(query):
-    good_result = False
     entities = query[:3]
-    while(not good_result):
-        if len(entities) == 0:
-            log.warning("No search found.  Returning empty result.")
-            return {}
+    while entities:
         query = "+".join(['"' + entity + '"' for entity in entities])
-        # url = 'https://api.gdeltproject.org/api/v2/tv/tv?query='+query+ 'market:%22National%22&mode=clipgallery&format=json&datanorm=perc&timelinesmooth=0&datacomb=sep&last24=yes&timezoom=yes&TIMESPAN=14days'
-        encoded_args = urlencode({'query': query + ' market:"National"',
-                                  'mode': 'clipgallery', 'format': 'json',
-                                  'datanorm': 'perc', "timelinesmooth": 0,
-                                  "datacomb": "sep", "last24": "yes",
-                                  "timezoom": "yes", "TIMESPAN": "14days"})
-        url = 'https://api.gdeltproject.org/api/v2/tv/tv?' + encoded_args
-        res = http.urlopen("GET", url)
+        res = http.request('GET', 'https://api.gdeltproject.org/api/v2/tv/tv',
+                           fields={'query': query + ' market:"National"',
+                                   'mode': 'clipgallery', 'format': 'json',
+                                   'datanorm': 'perc', "timelinesmooth": 0,
+                                   "datacomb": "sep", "last24": "yes",
+                                   "timezoom": "yes", "TIMESPAN": "14days"})
+        log.info(res.geturl())
         if res.status >= 400:
             log.error("GDELT returned status code: %d. Exiting...", res.status)
             return {}
         try:
             gdelt_json = json.loads(res.data.decode('utf-8'))
         except ValueError:
-            log.warning("Bad GDELT response, Returning empty result.")
-            log.warning(url)
             gdelt_json = {}
-        log.info(url)
-        if len(gdelt_json.keys()) == 0:
+        if not gdelt_json:
             entities = entities[0:-1]
-            log.info("GDLET returned 0 results. Simplifying search to: " + str(entities))
-        else:
-            good_result = True
-    return gdelt_json
+            log.info("GDELT returned 0 results. Simplifying search to: " + str(entities))
+
+    log.warning("No search found. Returning empty result.")
+    return {}
 
 
 def sortClipsBySimilarity(clips, article):
