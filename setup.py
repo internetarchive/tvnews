@@ -24,24 +24,26 @@ setuptools.setup(
         name='tvnews',
         version='0.2.0',
         description='Recommends TV news clips related to given news articles',
-        url='https://github.com/MaxReinisch/tvnews',
+        url='https://github.com/internetarchive/tvnews',
         author='Max W. Reinisch',
         author_email='reinischmax@gmail.com',
         long_description=open('README.md').read(),
         license='LICENSE.txt',
         packages=['tvnews'],
         install_requires=[
-            "lxml",
-            "numpy",
             "readability-lxml",
             "scikit-learn",
             "scipy",
             "spacy<=2.3.2",
             "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz",
-            "urllib3"
+            "urllib3>=1.25.8"
             ],
-        test_suite='nose.collector',
-        tests_require=['nose'],
+        tests_require=[
+            'zipp<2',
+            'pytest<5',
+            'pytest-xdist',
+            'mock<4'
+            ],
         zip_safe=False,
         classifiers=[
             'Development Status :: 4 - Beta'
