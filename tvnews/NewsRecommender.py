@@ -2,6 +2,7 @@
 # clips similar to article contents
 from collections import Counter
 import logging
+import math
 import json
 import urllib3
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -21,7 +22,7 @@ def makeRecommendations(article):
     query = getSearchQuery(article)
     GDELT_response = getGDELTv2Response(query)  # GDELT_response in JSON format
     if GDELT_response.get('clips'):
-        return list(sortClipsBySimilarity(GDELT_response.get("clips"), article))
+        return sortClipsBySimilarity(GDELT_response.get("clips"), article)
     return []
 
 
@@ -38,7 +39,7 @@ def extractEntities(article):
 
 
 def parseEntities(entities):
-    if len(entities) == 0:
+    if not entities:
         return []
     return [e[0] for e in Counter(entities).most_common(3)]
 
@@ -64,20 +65,23 @@ def getGDELTv2Response(query):
             gdelt_json = {}
 
         entities.pop()
-        log.info("GDELT returned 0 results. Simplifying search to: " + str(entities))
+        log.info("GDELT returned 0 results. Simplifying search to: %s",
+                 str(entities))
 
     log.warning("No search found. Returning empty result.")
     return {}
 
 
+vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
+
+
 def sortClipsBySimilarity(clips, article):
-    vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
     cosine_distances = [cosine(vec.todense(), article_bow.todense()) for vec in bow]
     ret = []
     for clip, dist in zip(clips, cosine_distances):
-        if not dist:
+        if not dist or math.isnan(dist):
             dist = 0
         clip.update({"similarity": dist})
         ret.append(clip)

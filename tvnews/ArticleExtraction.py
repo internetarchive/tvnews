@@ -11,8 +11,13 @@ def extract(html):
     """
     try:
         doc = Document(html)
-        return {"title": tag_re.sub('', doc.title()),
-                "body": tag_re.sub('', doc.summary()).replace("\n", " ").replace("\xa0", " ")}
+        return {
+            "title": tag_re.sub('', doc.title()),
+            "body": tag_re.sub('', doc.summary())
+                    .replace("\n", " ")
+                    .replace("\xa0", " ")
+                    .strip()
+            }
     except Exception:
         # Note that readability-lxml as of 0.8.1 does not provide any custom
         # exceptions we could handle.
