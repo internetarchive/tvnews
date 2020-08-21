@@ -77,7 +77,9 @@ def sortClipsBySimilarity(clips, article):
     cosine_distances = [cosine(vec.todense(), article_bow.todense()) for vec in bow]
     ret = []
     for clip, dist in zip(clips, cosine_distances):
+        if not dist:
+            dist = 0
         clip.update({"similarity": dist})
         ret.append(clip)
     log.info(ret)
-    return sorted(ret, key=lambda x: x.get('similarity'))
+    return sorted(ret, key=lambda x: x.get('similarity', 0))
