@@ -22,7 +22,7 @@ import setuptools
 
 setuptools.setup(
         name='tvnews',
-        version='0.2.3',
+        version='0.2.4',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/internetarchive/tvnews',
         author='Max W. Reinisch',
