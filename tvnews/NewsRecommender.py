@@ -41,7 +41,7 @@ def extractEntities(article):
 def parseEntities(entities):
     if not entities:
         return []
-    return [e[0] for e in Counter(entities).most_common(3)]
+    return [e[0] for e in Counter(entities).most_common(1000)]
 
 
 def getGDELTv2Response(query):
