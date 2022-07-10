@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.5', '3.6', '3.8', '3.10']
+        python-version: ['3.5', '3.6', '3.8', '3.9']  # `pip install --editable .` is SLOW on Py35 and Py310 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,7 +14,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install --upgrade pip wheel
       - run: pip install bandit codespell flake8 flake8-bugbear
-                         flake8-comprehensions isort pytest pyupgrade safety  # mypy
+                         flake8-comprehensions isort pytest pyupgrade safety
       - run: bandit --recursive --skip B101 .  # B101 is assert statements
       - if: matrix.python-version >= 3.6
         run: |
@@ -24,8 +24,10 @@ jobs:
       - run: flake8 . --ignore=E123,E126,E131,E226 --max-complexity=10 --max-line-length=140 --show-source --statistics
       - run: isort --check-only --profile black . || true
       - run: pip install --editable .
-      # - run: mkdir --parents --verbose .mypy_cache
-      # - run: mypy --ignore-missing-imports --install-types --non-interactive . || true
+      - if: matrix.python-version >= 3.6
+      - run: |
+          mkdir --parents --verbose .mypy_cache
+          mypy --ignore-missing-imports --install-types --non-interactive . || true
       - run: pytest --doctest-modules .
       - run: shopt -s globstar && pyupgrade --py36-plus **/*.py
       - run: safety check || true
