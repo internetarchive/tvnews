@@ -27,6 +27,7 @@ jobs:
       - if: matrix.python-version >= 3.6
         run: |
           mkdir --parents --verbose .mypy_cache
+          pip install mypy
           mypy --ignore-missing-imports --install-types --non-interactive . || true
       - run: pytest --doctest-modules .
       - run: shopt -s globstar && pyupgrade --py36-plus **/*.py
