@@ -13,12 +13,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install --upgrade pip wheel
-      - run: pip install bandit black codespell flake8 flake8-2020 flake8-bugbear
+      - run: pip install bandit codespell flake8 flake8-2020 flake8-bugbear
                          flake8-comprehensions isort pytest pyupgrade safety  # mypy
       - run: bandit --recursive --skip B101 .  # B101 is assert statements
-      - run: black --check . || true
+      - if: matrix.python-version >= 3.6
+        run: |
+          pip install black
+          black --check . || true
       - run: codespell || true  # --ignore-words-list="" --skip="*.css,*.js,*.lock"
-      - run: flake8 . --ignore=E131 --max-complexity=10 --max-line-length=140 --show-source --statistics
+      - run: flake8 . --ignore=E123,E126,E131,E226 --max-complexity=10 --max-line-length=140 --show-source --statistics
       - run: isort --check-only --profile black . || true
       - run: pip install -r requirements.txt || pip install --editable . || pip install . || true
       # - run: mkdir --parents --verbose .mypy_cache
