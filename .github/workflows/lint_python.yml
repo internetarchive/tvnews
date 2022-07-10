@@ -25,7 +25,7 @@ jobs:
       - run: isort --check-only --profile black . || true
       - run: pip install --editable .
       - if: matrix.python-version >= 3.6
-      - run: |
+        run: |
           mkdir --parents --verbose .mypy_cache
           mypy --ignore-missing-imports --install-types --non-interactive . || true
       - run: pytest --doctest-modules .
