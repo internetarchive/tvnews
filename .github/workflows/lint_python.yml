@@ -1,0 +1,34 @@
+name: lint_python
+on: [pull_request, push]
+jobs:
+  lint_python:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.5', '3.6', '3.8']  # `pip install --editable .` is SLOW on Py35, Py39, and Py310 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install --upgrade pip wheel
+      - run: pip install bandit codespell flake8 flake8-bugbear
+                         flake8-comprehensions isort pytest pyupgrade safety
+      - run: bandit --recursive --skip B101 .  # B101 is assert statements
+      - if: matrix.python-version >= 3.6
+        run: |
+          pip install black flake8-2020
+          black --check . || true
+      - run: codespell  # --ignore-words-list="" --skip="*.css,*.js,*.lock"
+      - run: flake8 . --ignore=E123,E126,E131,E226 --max-complexity=10 --max-line-length=140 --show-source --statistics
+      - run: isort --check-only --profile black . || true
+      - run: pip install --editable .
+      - if: matrix.python-version >= 3.6
+        run: |
+          mkdir --parents --verbose .mypy_cache
+          pip install mypy
+          mypy --ignore-missing-imports --install-types --non-interactive . || true
+      - run: pytest --doctest-modules .
+      - run: shopt -s globstar && pyupgrade --py36-plus **/*.py
+      - run: safety check || true
