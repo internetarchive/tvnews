@@ -7,7 +7,8 @@ import json
 import urllib3
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
-import en_core_web_sm
+import numpy as np
+import spacy
 
 
 GDELT_HEADER = {'Content-Type': 'application/json',
@@ -15,7 +16,7 @@ GDELT_HEADER = {'Content-Type': 'application/json',
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
 http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
-nlp = en_core_web_sm.load()
+nlp = spacy.load('en_core_web_sm')
 
 
 def makeRecommendations(article):
@@ -78,7 +79,7 @@ vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
 def sortClipsBySimilarity(clips, article):
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
-    cosine_distances = [cosine(vec.todense(), article_bow.todense()) for vec in bow]
+    cosine_distances = [cosine(np.array(vec.todense())[0, :], np.array(article_bow.todense())[0,:]) for vec in bow]
     ret = []
     for clip, dist in zip(clips, cosine_distances):
         if not dist or math.isnan(dist):

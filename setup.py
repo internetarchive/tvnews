@@ -34,8 +34,8 @@ setuptools.setup(
             "readability-lxml>=0.8.1",
             "scikit-learn",
             "scipy",
-            "spacy<=2.3.2",
-            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz",
+            "numpy",
+            "spacy",
             "urllib3>=1.25.8"
             ],
         tests_require=[
