@@ -7,7 +7,6 @@ import json
 import urllib3
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
-import numpy as np
 import spacy
 
 
@@ -79,7 +78,7 @@ vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
 def sortClipsBySimilarity(clips, article):
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
-    cosine_distances = [cosine(np.array(vec.todense())[0, :], np.array(article_bow.todense())[0,:]) for vec in bow]
+    cosine_distances = [cosine(vec.toarray()[0, :], article_bow.toarray()[0,:]) for vec in bow]
     ret = []
     for clip, dist in zip(clips, cosine_distances):
         if not dist or math.isnan(dist):
