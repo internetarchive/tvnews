@@ -35,7 +35,7 @@ setuptools.setup(
             "scikit-learn",
             "scipy",
             "numpy",
-            "spacy",
+            "spacy>=3.5.1",
             "urllib3>=1.25.8"
             ],
         tests_require=[
