@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.5', '3.6', '3.8']  # `pip install --editable .` is SLOW on Py35, Py39, and Py310 
+        python-version: ['3.8']  # `pip install --editable .` is SLOW on Py35, Py39, and Py310 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,7 +20,7 @@ jobs:
         run: |
           pip install black flake8-2020
           black --check . || true
-      - run: codespell  # --ignore-words-list="" --skip="*.css,*.js,*.lock"
+      - run: codespell ./tvnews  # --ignore-words-list="" --skip="*.css,*.js,*.lock"
       - run: flake8 . --ignore=E123,E126,E131,E226 --max-complexity=10 --max-line-length=140 --show-source --statistics
       - run: isort --check-only --profile black . || true
       - run: pip install --editable .
