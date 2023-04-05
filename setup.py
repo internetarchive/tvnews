@@ -35,9 +35,10 @@ setuptools.setup(
             "scikit-learn",
             "scipy",
             "numpy",
-            "spacy>=3.5.1",
-            "urllib3>=1.25.8"
-            ],
+            "spacy<2.4.0",
+            "urllib3>=1.25.8",
+            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz"
+        ],
         tests_require=[
             'zipp<2',
             'pytest<5',
@@ -49,6 +50,5 @@ setuptools.setup(
             'Development Status :: 4 - Beta'
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.5',
-            'Topic :: Software Development :: Libraries :: Python Modules',
-
+            'Topic :: Software Development :: Libraries :: Python Modules'
         ])

@@ -7,16 +7,14 @@ import json
 import urllib3
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
-import spacy
-
+import en_core_web_sm
 
 GDELT_HEADER = {'Content-Type': 'application/json',
                 'outputformat': 'application/json'}
 log = logging.getLogger(__name__)
 urllib3.disable_warnings()
 http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
-nlp = spacy.load('en_core_web_sm')
-
+nlp = en_core_web_sm.load()
 
 def makeRecommendations(article):
     query = getSearchQuery(article)
