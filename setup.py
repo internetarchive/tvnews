@@ -22,7 +22,7 @@ import setuptools
 
 setuptools.setup(
         name='tvnews',
-        version='0.2.5',
+        version='0.2.6',
         description='Recommends TV news clips related to given news articles',
         url='https://github.com/internetarchive/tvnews',
         author='Max W. Reinisch',
@@ -34,16 +34,15 @@ setuptools.setup(
             "readability-lxml>=0.8.1",
             "scikit-learn",
             "scipy",
-            "numpy",
-            "spacy<2.4.0",
-            "urllib3>=1.25.8",
-            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz"
+            "numpy<2",
+            "spacy==3.7.5",
+            "urllib3==1.26.16",
+            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz"
         ],
         tests_require=[
-            'zipp<2',
-            'pytest<5',
+            'pytest',
             'pytest-xdist',
-            'mock<4'
+            'mock'
             ],
         zip_safe=False,
         classifiers=[

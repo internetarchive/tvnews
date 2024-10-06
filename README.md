@@ -1,7 +1,5 @@
 # Article 2 TV News
 
-Uses python 3.4
-
 Article2TVNews allows users to find TV news clips on subjects related
 to an article they are reading.  It provides methods to extract text from an
 article and get tv news clips based on the article's subject.  This package is
