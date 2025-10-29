@@ -74,6 +74,8 @@ vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
 
 
 def sortClipsBySimilarity(clips, article):
+    if not clips:
+        return []
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
     cosine_distances = [cosine(vec.toarray()[0, :], article_bow.toarray()[0,:]) for vec in bow]
