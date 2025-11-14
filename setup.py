@@ -36,7 +36,7 @@ setuptools.setup(
             "scipy",
             "numpy<2",
             "spacy==3.7.5",
-            "urllib3==1.26.16",
+            "urllib3==2.5.0",
             "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz"
         ],
         tests_require=[
