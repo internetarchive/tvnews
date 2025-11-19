@@ -32,12 +32,12 @@ setuptools.setup(
         packages=['tvnews'],
         install_requires=[
             "readability-lxml>=0.8.1",
-            "scikit-learn",
-            "scipy",
-            "numpy<2",
-            "spacy==3.7.5",
-            "urllib3==1.26.16",
-            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz"
+            "scikit-learn>=1.0.0",
+            "scipy>=1.7.0",
+            "numpy>=1.21.0,<2",
+            "spacy>=3.8.0",
+            "urllib3>=1.26.16",
+            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz"
         ],
         tests_require=[
             'pytest',
