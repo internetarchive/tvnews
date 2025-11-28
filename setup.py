@@ -35,9 +35,9 @@ setuptools.setup(
             "scikit-learn",
             "scipy",
             "numpy",
-            "spacy",
+            "spacy>=3.7.5,<3.8.0",
             "urllib3>=2.0.0",
-            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz"
+            "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz"
         ],
         tests_require=[
             'pytest',
