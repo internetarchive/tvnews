@@ -47,12 +47,12 @@ def test_makeRecommendations_bad_calais():
 
 
 def test_sortClipsBySimilarity():
-        article = ArticleExtraction.extract(good_html)
-        query = NewsRecommender.getSearchQuery(article)
-        GDELT_response = NewsRecommender.getGDELTv2Response(query)
-        sorted_clips = NewsRecommender.sortClipsBySimilarity(GDELT_response.get("clips"), article)
-        for clip in sorted_clips:
-            for key in EXPECTED_KEYS:
-                assert clip.get(key)
-        for i in range(len(sorted_clips)-1):
-            assert sorted_clips[i].get("similarity") <= sorted_clips[i+1].get("similarity")
+    article = ArticleExtraction.extract(good_html)
+    query = NewsRecommender.getSearchQuery(article)
+    GDELT_response = NewsRecommender.getGDELTv2Response(query)
+    sorted_clips = NewsRecommender.sortClipsBySimilarity(GDELT_response.get("clips"), article)
+    for clip in sorted_clips:
+        for key in EXPECTED_KEYS:
+            assert clip.get(key)
+    for i in range(len(sorted_clips)-1):
+        assert sorted_clips[i].get("similarity") <= sorted_clips[i+1].get("similarity")

@@ -16,6 +16,7 @@ urllib3.disable_warnings()
 http = urllib3.PoolManager(num_pools=10, maxsize=10, cert_reqs='CERT_NONE')
 nlp = en_core_web_sm.load()
 
+
 def makeRecommendations(article):
     query = getSearchQuery(article)
     GDELT_response = getGDELTv2Response(query)  # GDELT_response in JSON format
@@ -74,9 +75,11 @@ vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
 
 
 def sortClipsBySimilarity(clips, article):
+    if not clips:
+        return []
     bow = vectorizer.fit_transform([clip.get('snippet') for clip in clips])
     article_bow = vectorizer.transform([article.get('body')])
-    cosine_distances = [cosine(vec.toarray()[0, :], article_bow.toarray()[0,:]) for vec in bow]
+    cosine_distances = [cosine(vec.toarray()[0, :], article_bow.toarray()[0, :]) for vec in bow]
     ret = []
     for clip, dist in zip(clips, cosine_distances):
         if not dist or math.isnan(dist):
